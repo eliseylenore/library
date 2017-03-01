@@ -247,8 +247,18 @@ namespace Library
             {
                 int id = rdr.GetInt32(0);
                 int bookId = rdr.GetInt32(1);
+                bool copyAvailability;
+                if (rdr.GetByte(2) == 1)
+                {
+                    copyAvailability = true;
+                }
+                else
+                {
+                    copyAvailability = false;
+                }
 
                 Copy newCopy = new Copy(bookId, id);
+                newCopy.SetAvailability(copyAvailability);
                 AllCopies.Add(newCopy);
             }
 
