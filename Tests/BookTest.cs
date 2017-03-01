@@ -60,6 +60,20 @@ namespace Library
             Assert.Equal(newBookTitle, actual);
         }
 
+        [Fact]
+        public void Delete_DeletesBookFromDatabase()
+        {
+            Book newBook = new Book("Roger Rabbit");
+            newBook.Save();
+
+            newBook.Delete();
+
+            List<Book> expectedResult = new List<Book>{};
+            List<Book> actualResult = Book.GetAll();
+
+            Assert.Equal(expectedResult, actualResult);
+        }
+
         public void Dispose()
         {
             Book.DeleteAll();
