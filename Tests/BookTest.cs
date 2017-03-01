@@ -35,6 +35,17 @@ namespace Library
             Assert.Equal(expectedResult, actual);
         }
 
+        [Fact]
+        public void FindById_ReturnsBookWhenSearchedById()
+        {
+            Book newBook = new Book("To Kill a Mockingbird");
+            newBook.Save();
+
+            Book result = Book.FindById(newBook.GetId());
+
+            Assert.Equal(newBook, result);
+        }
+
 
         public void Dispose()
         {
