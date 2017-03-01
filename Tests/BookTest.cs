@@ -81,15 +81,18 @@ namespace Library
             newBook.Save();
 
             Author newAuthor = new Author("John Doe");
+            newAuthor.Save();
             newBook.AddAuthor(newAuthor);
 
-            result = newBook.GetAuthor();
+            List<Author> expected = new List<Author>{newAuthor};
+            List<Author> result = newBook.GetAuthors();
 
-            Assert.Equal(newAuthor, result);
+            Assert.Equal(expected, result);
         }
 
         public void Dispose()
         {
+            Author.DeleteAll();
             Book.DeleteAll();
         }
     }

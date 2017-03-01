@@ -168,6 +168,68 @@ namespace Library
             }
         }
 
+        public void AddAuthor(Author newAuthor)
+        {
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("INSERT INTO authors_books(author_id, book_id) VALUES (@AuthorId, @BookId);", conn);
+
+            SqlParameter authorIdParameter = new SqlParameter();
+            authorIdParameter.ParameterName = "@AuthorId";
+            authorIdParameter.Value = newAuthor.GetId();
+            cmd.Parameters.Add(authorIdParameter);
+
+            SqlParameter bookIdParameter = new SqlParameter();
+            bookIdParameter.ParameterName = "@BookId";
+            bookIdParameter.Value = this.GetId();
+            cmd.Parameters.Add(bookIdParameter);
+
+            cmd.ExecuteNonQuery();
+
+            if(conn != null)
+            {
+                conn.Close();
+            }
+        }
+
+        public List<Author> GetAuthors()
+        {
+            List<Author> AllAuthors = new List<Author>{};
+
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT authors.* FROM books JOIN authors_books ON (books.id = authors_books.book_id) JOIN authors ON (authors.id = authors_books.author_id) WHERE book_id = @BookId;", conn);
+
+            SqlParameter bookIdParameter = new SqlParameter();
+            bookIdParameter.ParameterName = "@BookId";
+            bookIdParameter.Value = this.GetId().ToString();
+            cmd.Parameters.Add(bookIdParameter);
+
+            SqlDataReader rdr = cmd.ExecuteReader();
+
+            while(rdr.Read())
+            {
+                int authorId = rdr.GetInt32(0);
+                string authorName = rdr.GetString(1);
+
+                Author newAuthor = new Author(authorName, authorId);
+                AllAuthors.Add(newAuthor);
+            }
+
+            if(rdr != null)
+            {
+                rdr.Close();
+            }
+            if(conn != null)
+            {
+                conn.Close();
+            }
+
+            return AllAuthors;
+        }
+
         public void Delete()
         {
             SqlConnection conn = DB.Connection();
