@@ -230,6 +230,41 @@ namespace Library
             return AllAuthors;
         }
 
+        public List<Copy> GetCopies()
+        {
+            List<Copy> AllCopies = new List<Copy>{};
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT * FROM copies WHERE book_id = @BookId;", conn);
+            SqlParameter bookIdParameter = new SqlParameter();
+            bookIdParameter.ParameterName = "@BookId";
+            bookIdParameter.Value = this.GetId();
+            cmd.Parameters.Add(bookIdParameter);
+
+            SqlDataReader rdr = cmd.ExecuteReader();
+            while(rdr.Read())
+            {
+                int id = rdr.GetInt32(0);
+                int bookId = rdr.GetInt32(1);
+
+                Copy newCopy = new Copy(bookId, id);
+                AllCopies.Add(newCopy);
+            }
+
+            if(rdr != null)
+            {
+                rdr.Close();
+            }
+
+            if(conn != null)
+            {
+                conn.Close();
+            }
+
+            return AllCopies;
+        }
+
         public void Delete()
         {
             SqlConnection conn = DB.Connection();

@@ -90,6 +90,19 @@ namespace Library
             Assert.Equal(expected, result);
         }
 
+        [Fact]
+        public void GetCopies_ShowsAllCopiesForSelectedBook_List()
+        {
+            Book newBook = new Book("Roger Rabbit");
+            newBook.Save();
+
+            Copy newCopy = new Copy(newBook.GetId());
+            newCopy.Save();
+            List<Copy> expectedResult = new List<Copy>{newCopy};
+
+            Assert.Equal(expectedResult, newBook.GetCopies());
+        }
+
         public void Dispose()
         {
             Author.DeleteAll();
