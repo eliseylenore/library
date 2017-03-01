@@ -46,6 +46,19 @@ namespace Library
             Assert.Equal(newBook, result);
         }
 
+        [Fact]
+        public void Update_UpdatesBookName_Name()
+        {
+            Book newBook = new Book("To Kill a Mockingbird");
+            newBook.Save();
+
+            string newBookTitle = "Roger Rabbit";
+            newBook.Update(newBookTitle);
+
+            string actual = newBook.GetTitle();
+
+            Assert.Equal(newBookTitle, actual);
+        }
 
         public void Dispose()
         {
