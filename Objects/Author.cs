@@ -168,6 +168,44 @@ namespace Library
             }
         }
 
+
+        public List<Book> GetBooks()
+        {
+            List<Book> AllBooks = new List<Book>{};
+
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT books.* FROM authors JOIN authors_books ON (authors.id = authors_books.author_id) JOIN books ON (books.id = authors_books.book_id) WHERE author_id = @AuthorId;", conn);
+
+            SqlParameter authorIdParameter = new SqlParameter();
+            authorIdParameter.ParameterName = "@AuthorId";
+            authorIdParameter.Value = this.GetId().ToString();
+            cmd.Parameters.Add(authorIdParameter);
+
+            SqlDataReader rdr = cmd.ExecuteReader();
+
+            while(rdr.Read())
+            {
+                int bookId = rdr.GetInt32(0);
+                string bookTitle = rdr.GetString(1);
+
+                Book newBook = new Book(bookTitle, bookId);
+                AllBooks.Add(newBook);
+            }
+
+            if(rdr != null)
+            {
+                rdr.Close();
+            }
+            if(conn != null)
+            {
+                conn.Close();
+            }
+
+            return AllBooks;
+        }
+
         public void Delete()
         {
             SqlConnection conn = DB.Connection();

@@ -74,6 +74,23 @@ namespace Library
             Assert.Equal(expectedResult, actualResult);
         }
 
+        [Fact]
+        public void AddBook_AddsAuthorBookCombotoBook_Author()
+        {
+            Author newAuthor = new Author("John Doe");
+            newAuthor.Save();
+
+            Book newBook = new Book("Book Title");
+            newBook.Save();
+
+            newBook.AddAuthor(newAuthor);
+
+            List<Book> expected = new List<Book> {newBook};
+            List<Book> result = newAuthor.GetBooks();
+
+            Assert.Equal(expected, result);
+        }
+
         public void Dispose()
         {
             Book.DeleteAll();
