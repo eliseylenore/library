@@ -45,6 +45,61 @@ namespace Library
             return this.GetTitle().GetHashCode();
         }
 
+        public static List<Book> GetAll()
+        {
+            List<Book> AllBooks = new List<Book> {};
+
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT * FROM books;", conn);
+            SqlDataReader rdr = cmd.ExecuteReader();
+
+            while(rdr.Read())
+            {
+                int bookId = rdr.GetInt32(0);
+                string bookTitle = rdr.GetString(1);
+
+                Book newBook = new Book(bookTitle, bookId);
+                AllBooks.Add(newBook);
+            }
+
+            if(rdr != null)
+            {
+                rdr.Close();
+            }
+            if(conn != null)
+            {
+                conn.Close();
+            }
+            return AllBooks;
+        }
+
+        public void Save()
+        {
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("INSERT INTO books(title) OUTPUT INSERTED.id VALUES(@BookTitle);", conn);
+
+            SqlParameter bookTitle = new SqlParameter();
+            bookTitle.ParameterName = "@BookTitle";
+            bookTitle.Value = this.GetTitle();
+            cmd.Parameters.Add(bookTitle);
+
+            SqlDataReader rdr = cmd.ExecuteReader();
+
+            while(rdr.Read())
+            {
+                this._id = rdr.GetInt32(0);
+            }
+
+            if(conn != null)
+            {
+                conn.Close();
+            }
+        }
+
         public static void DeleteAll()
         {
             SqlConnection conn = DB.Connection();
