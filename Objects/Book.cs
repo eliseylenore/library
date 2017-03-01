@@ -4,40 +4,49 @@ using System;
 
 namespace Library
 {
-  public class Book
-  {
-      private int _id;
-      private string _title;
+    public class Book
+    {
+        private int _id;
+        private string _title;
 
-      public Book(string title, int Id = 0)
-      {
-          _id = Id;
-          _title = Title;
-      }
+        public Book(string title, int Id = 0)
+        {
+            _id = Id;
+            _title = Title;
+        }
 
-      public int GetId()
-      {
-          return _id;
-      }
+        public int GetId()
+        {
+            return _id;
+        }
 
-      public string GetTitle()
-      {
-          return _title;
-      }
+        public string GetTitle()
+        {
+            return _title;
+        }
 
-      public overrides bool Equals(Book otherBook)
-      {
-          if(!(otherBook is Book))
-          {
-              return false;
-          }
-          else
-          {
-              Book newBook = (Book) otherBook;
-              bool idEquality = (this.GetId() == newBook.GetId());
-              bool titleEquality = (this.GetTitle() == newBook.GetId());
-              return (idEquality && titleEquality);
-          }
-      }
-  }
+        public overrides bool Equals(Book otherBook)
+        {
+            if(!(otherBook is Book))
+            {
+                return false;
+            }
+            else
+            {
+                Book newBook = (Book) otherBook;
+                bool idEquality = (this.GetId() == newBook.GetId());
+                bool titleEquality = (this.GetTitle() == newBook.GetId());
+                return (idEquality && titleEquality);
+            }
+        }
+
+        public static void DeleteAll()
+        {
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+            SqlCommand cmd = new SqlCommand("DELETE FROM books;", conn);
+            cmd.ExecuteNonQuery();
+            conn.Close();
+        }
+    }
 }
