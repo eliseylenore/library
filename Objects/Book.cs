@@ -9,7 +9,7 @@ namespace Library
         private int _id;
         private string _title;
 
-        public Book(string title, int Id = 0)
+        public Book(string Title, int Id = 0)
         {
             _id = Id;
             _title = Title;
@@ -25,7 +25,7 @@ namespace Library
             return _title;
         }
 
-        public overrides bool Equals(Book otherBook)
+        public override bool Equals(System.Object otherBook)
         {
             if(!(otherBook is Book))
             {
@@ -35,9 +35,14 @@ namespace Library
             {
                 Book newBook = (Book) otherBook;
                 bool idEquality = (this.GetId() == newBook.GetId());
-                bool titleEquality = (this.GetTitle() == newBook.GetId());
+                bool titleEquality = (this.GetTitle() == newBook.GetTitle());
                 return (idEquality && titleEquality);
             }
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetTitle().GetHashCode();
         }
 
         public static void DeleteAll()
