@@ -218,6 +218,7 @@ namespace Library
             while(rdr.Read())
             {
                 int copyId = rdr.GetInt32(0);
+                int bookId = rdr.GetInt32(1);
                 bool copyAvailability;
                 if (rdr.GetByte(2) == 1)
                 {
@@ -227,7 +228,7 @@ namespace Library
                     copyAvailability = false;
                 }
 
-                Copy foundCopy = new Copy(copyId);
+                Copy foundCopy = new Copy(bookId, copyId);
                 foundCopy.SetAvailability(copyAvailability);
                 AllCheckedOutCopies.Add(foundCopy);
             }

@@ -80,17 +80,22 @@ namespace Library
             Patron newPatron = new Patron("Joe");
             newPatron.Save();
 
-            Copy newCopy = new Copy(1);
+            Book newBook = new Book("Gone With the Wind");
+            newBook.Save();
+
+            Copy newCopy = new Copy(newBook.GetId());
             newCopy.Save();
 
-            DateTime dueDate = new DateTime(2017, 01, 01);
+
+            DateTime dueDate = new DateTime(2017, 1, 1);
             newPatron.Checkout(newCopy.GetId(), newPatron.GetId(), dueDate);
 
 
             List<Copy> expectedResult = new List<Copy>{newCopy};
             List<Copy> actualResult = newPatron.GetCheckedOutCopies();
 
-            Console.WriteLine(actualResult[0]);
+            Console.WriteLine(actualResult[0].GetId());
+            Console.WriteLine(expectedResult[0].GetId());
 
             Assert.Equal(expectedResult, actualResult);
         }
@@ -132,6 +137,9 @@ namespace Library
 
         public void Dispose()
         {
+            Checkout.DeleteAll();
+            Book.DeleteAll();
+            Copy.DeleteAll();
             Patron.DeleteAll();
         }
     }

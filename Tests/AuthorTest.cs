@@ -31,7 +31,6 @@ namespace Library
             List<Author> expectedResult = new List<Author>{newAuthor};
             List<Author> actual = Author.GetAll();
 
-            Console.WriteLine("ExpectedResult: " + expectedResult[0].GetName() + " Actual result: " + actual[0].GetName());
             Assert.Equal(expectedResult, actual);
         }
 

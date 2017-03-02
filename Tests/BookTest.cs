@@ -31,7 +31,6 @@ namespace Library
             List<Book> expectedResult = new List<Book>{newBook};
             List<Book> actual = Book.GetAll();
 
-            Console.WriteLine("ExpectedResult: " + expectedResult[0].GetTitle() + " Actual result: " + actual[0].GetTitle());
             Assert.Equal(expectedResult, actual);
         }
 
