@@ -75,24 +75,60 @@ namespace Library
         }
 
         [Fact]
-        public void GetCheckedOutBooks_ReturnListOfBooks()
+        public void GetCheckedOutCopies_ReturnListOfCopies()
         {
             Patron newPatron = new Patron("Joe");
             newPatron.Save();
 
-            Book newBook = new Book("Cotton Eyed Joe");
-            newBook.Save();
-
-            Copy newCopy = new Copy(newBook.GetId());
+            Copy newCopy = new Copy(1);
             newCopy.Save();
 
-            newPatron.Checkout(newCopy.GetId(), "June 12", "Aug 14");
+            DateTime dueDate = new DateTime(2017, 01, 01);
+            newPatron.Checkout(newCopy.GetId(), newPatron.GetId(), dueDate);
 
-            List<Book> expectedResult = new List<Book>{newBook};
-            List<Book> actualResult = newPatron.GetCheckedOutBooks();
+
+            List<Copy> expectedResult = new List<Copy>{newCopy};
+            List<Copy> actualResult = newPatron.GetCheckedOutCopies();
+
+            Console.WriteLine(actualResult[0]);
 
             Assert.Equal(expectedResult, actualResult);
         }
+
+        // [Fact]
+        // public void CheckIn_MarksCopyAsCheckedIn()
+        // {
+        //
+        // }
+        //
+        // [Fact]
+        // public void GetOverDueBooks_ReturnsListOfOverDueBooks()
+        // {
+        //     Patron newPatron = new Patron("Joe");
+        //     newPatron.Save();
+        //
+        //     Book newBook = new Book("Cotton Eyed Joe");
+        //     newBook.Save();
+        //
+        //     Copy newCopy = new Copy(newBook.GetId());
+        //     newCopy.Save();
+        //
+        //     Book secondBook = new Book("Johnny Boy");
+        //     secondBook.Save();
+        //
+        //     Copy secondCopy = new Copy(secondBook.GetId());
+        //     secondCopy.Save();
+        //
+        //     newPatron.Checkout(newCopy.GetId(), "June 1", "June 12");
+        //     newPatron.Checkout(secondCopy.GetId(), "June 1", "June 14");
+        //
+        //     List<Book> expectedResult = new List<Book> {newBook};
+        //     List<Book> actualResult = newPatron.GetOverDue();
+        //
+        //     Assert.Equal(expectedResult, actualResult);
+        //
+        // }
+
 
         public void Dispose()
         {

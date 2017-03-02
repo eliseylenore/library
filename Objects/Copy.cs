@@ -22,6 +22,12 @@ namespace Library
             return _id;
         }
 
+        public Book GetBook()
+        {
+            return Book.FindById(_bookId);
+            // thisCopy.GetBook().GetTitle();
+        }
+
         public int GetBookId()
         {
             return _bookId;

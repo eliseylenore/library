@@ -168,12 +168,12 @@ namespace Library
             }
         }
 
-        public void Checkout(int copyId, string checkoutDate, string dueDate)
+        public void Checkout(int copyId, int patronId, DateTime dueDate)
         {
             SqlConnection conn = DB.Connection();
             conn.Open();
 
-            SqlCommand cmd = new SqlCommand("INSERT into checkouts(copy_id, patron_id, checkout, due) OUTPUT INSERTED.id VALUES(@CopyId, @PatronId, @CheckoutDate, @DueDate);", conn);
+            SqlCommand cmd = new SqlCommand("INSERT into checkouts(copy_id, patron_id, due, checkin) VALUES(@CopyId, @PatronId, @DueDate, 0);", conn);
 
             SqlParameter copyIdParameter = new SqlParameter();
             copyIdParameter.ParameterName = "@CopyId";
@@ -185,14 +185,10 @@ namespace Library
             patronIdParameter.Value = this._id;
             cmd.Parameters.Add(patronIdParameter);
 
-            SqlParameter checkoutDateParameter = new SqlParameter();
-            checkoutDateParameter.ParameterName = "@CheckoutDate";
-            checkoutDateParameter.Value = Convert.ToDateTime(checkoutDate);
-            cmd.Parameters.Add(checkoutDateParameter);
 
             SqlParameter dueDateParameter = new SqlParameter();
             dueDateParameter.ParameterName = "@DueDate";
-            dueDateParameter.Value = Convert.ToDateTime(dueDate);
+            dueDateParameter.Value = dueDate;
             cmd.Parameters.Add(dueDateParameter);
 
             cmd.ExecuteNonQuery();
@@ -203,14 +199,14 @@ namespace Library
             }
         }
 
-        public List<Book> GetCheckedOutBooks()
+        public List<Copy> GetCheckedOutCopies()
         {
-            List<Book> AllCheckedOutBooks = new List<Book>{};
+            List<Copy> AllCheckedOutCopies = new List<Copy>{};
 
             SqlConnection conn = DB.Connection();
             conn.Open();
 
-            SqlCommand cmd = new SqlCommand("SELECT books.* FROM patrons JOIN checkouts ON (patrons.id = checkouts.patron_id) JOIN copies ON (copies.id = checkouts.copy_id) JOIN books ON (books.id = copies.book_id) WHERE patron_id = @PatronId;", conn);
+            SqlCommand cmd = new SqlCommand("SELECT copies.* FROM patrons JOIN checkouts ON (patrons.id = checkouts.patron_id) JOIN copies ON (copies.id = checkouts.copy_id) WHERE patron_id = @PatronId;", conn);
 
             SqlParameter patronIdParameter = new SqlParameter();
             patronIdParameter.ParameterName = "@PatronId";
@@ -221,11 +217,19 @@ namespace Library
 
             while(rdr.Read())
             {
-                int bookId = rdr.GetInt32(0);
-                string bookTitle = rdr.GetString(1);
+                int copyId = rdr.GetInt32(0);
+                bool copyAvailability;
+                if (rdr.GetByte(2) == 1)
+                {
+                    copyAvailability = true;
+                }
+                else{
+                    copyAvailability = false;
+                }
 
-                Book foundBook = new Book(bookTitle, bookId);
-                AllCheckedOutBooks.Add(foundBook);
+                Copy foundCopy = new Copy(copyId);
+                foundCopy.SetAvailability(copyAvailability);
+                AllCheckedOutCopies.Add(foundCopy);
             }
 
             if(rdr != null)
@@ -237,7 +241,7 @@ namespace Library
                 conn.Close();
             }
 
-            return AllCheckedOutBooks;
+            return AllCheckedOutCopies;
         }
 
         public void Delete()
