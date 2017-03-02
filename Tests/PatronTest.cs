@@ -87,52 +87,47 @@ namespace Library
             newCopy.Save();
 
 
-            DateTime dueDate = new DateTime(2017, 1, 1);
+            DateTime dueDate = new DateTime(2017, 6, 1);
             newPatron.Checkout(newCopy.GetId(), newPatron.GetId(), dueDate);
 
-
+            DateTime currentDate = new DateTime(2017, 7, 1);
             List<Copy> expectedResult = new List<Copy>{newCopy};
-            List<Copy> actualResult = newPatron.GetCheckedOutCopies();
+            List<Copy> actualResult = newPatron.GetCheckedOutCopies(currentDate);
 
-            Console.WriteLine(actualResult[0].GetId());
-            Console.WriteLine(expectedResult[0].GetId());
+
 
             Assert.Equal(expectedResult, actualResult);
         }
 
-        // [Fact]
-        // public void CheckIn_MarksCopyAsCheckedIn()
-        // {
-        //
-        // }
-        //
-        // [Fact]
-        // public void GetOverDueBooks_ReturnsListOfOverDueBooks()
-        // {
-        //     Patron newPatron = new Patron("Joe");
-        //     newPatron.Save();
-        //
-        //     Book newBook = new Book("Cotton Eyed Joe");
-        //     newBook.Save();
-        //
-        //     Copy newCopy = new Copy(newBook.GetId());
-        //     newCopy.Save();
-        //
-        //     Book secondBook = new Book("Johnny Boy");
-        //     secondBook.Save();
-        //
-        //     Copy secondCopy = new Copy(secondBook.GetId());
-        //     secondCopy.Save();
-        //
-        //     newPatron.Checkout(newCopy.GetId(), "June 1", "June 12");
-        //     newPatron.Checkout(secondCopy.GetId(), "June 1", "June 14");
-        //
-        //     List<Book> expectedResult = new List<Book> {newBook};
-        //     List<Book> actualResult = newPatron.GetOverDue();
-        //
-        //     Assert.Equal(expectedResult, actualResult);
-        //
-        // }
+        [Fact]
+        public void GetCheckedOutCopies_OnlyReturnsCheckedoutBook()
+        {
+            DateTime dueDate = new DateTime(2017, 6, 1);
+
+            Patron newPatron = new Patron("Joe");
+            newPatron.Save();
+
+            Book newBook = new Book("Gone With the Wind");
+            newBook.Save();
+
+            Copy copy1 = new Copy(newBook.GetId());
+            copy1.Save();
+            newPatron.Checkout(copy1.GetId(), newPatron.GetId(), dueDate);
+
+            Copy copy2 = new Copy(newBook.GetId());
+            copy2.Save();
+            Checkout newCheckout = newPatron.Checkout(copy2.GetId(), newPatron.GetId(), dueDate);
+            newCheckout.CheckIn();
+
+
+            DateTime currentDate = new DateTime(2017, 7, 1);
+            List<Copy> expectedResult = new List<Copy>{copy1};
+            List<Copy> actualResult = newPatron.GetCheckedOutCopies(currentDate);
+
+            Assert.Equal(expectedResult, actualResult);
+        }
+
+
 
 
         public void Dispose()

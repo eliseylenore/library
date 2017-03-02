@@ -168,12 +168,12 @@ namespace Library
             }
         }
 
-        public void Checkout(int copyId, int patronId, DateTime dueDate)
+        public Checkout Checkout(int copyId, int patronId, DateTime dueDate)
         {
             SqlConnection conn = DB.Connection();
             conn.Open();
 
-            SqlCommand cmd = new SqlCommand("INSERT into checkouts(copy_id, patron_id, due, checkin) VALUES(@CopyId, @PatronId, @DueDate, 0);", conn);
+            SqlCommand cmd = new SqlCommand("INSERT into checkouts(copy_id, patron_id, due, checkin) OUTPUT INSERTED.* VALUES(@CopyId, @PatronId, @DueDate, 0);", conn);
 
             SqlParameter copyIdParameter = new SqlParameter();
             copyIdParameter.ParameterName = "@CopyId";
@@ -191,27 +191,60 @@ namespace Library
             dueDateParameter.Value = dueDate;
             cmd.Parameters.Add(dueDateParameter);
 
-            cmd.ExecuteNonQuery();
+            SqlDataReader rdr = cmd.ExecuteReader();
+            int newCheckoutId = 0;
+            int newCopyId = 0;
+            int newPatronId = 0;
+            DateTime due = new DateTime (1900, 01, 01);
+            bool checkin = false;
 
-            if(conn != null)
+
+            while(rdr.Read())
+            {
+                newCheckoutId = rdr.GetInt32(0);
+                newCopyId = rdr.GetInt32(1);
+                newPatronId = rdr.GetInt32(2);
+                due = rdr.GetDateTime(3);
+                if (rdr.GetByte(4) == 1)
+                {
+                    checkin = true;
+                }
+                else{
+                    checkin = false;
+                }
+            }
+            Checkout newCheckout = new Checkout(newCopyId, newPatronId, due, newCheckoutId);
+            newCheckout.SetCheckInStatus(checkin);
+
+            if(rdr != null)
+            {
+                rdr.Close();
+            }
+            if (conn != null)
             {
                 conn.Close();
             }
+            return newCheckout;
         }
 
-        public List<Copy> GetCheckedOutCopies()
+        public List<Copy> GetCheckedOutCopies(DateTime currentDate)
         {
             List<Copy> AllCheckedOutCopies = new List<Copy>{};
 
             SqlConnection conn = DB.Connection();
             conn.Open();
 
-            SqlCommand cmd = new SqlCommand("SELECT copies.* FROM patrons JOIN checkouts ON (patrons.id = checkouts.patron_id) JOIN copies ON (copies.id = checkouts.copy_id) WHERE patron_id = @PatronId;", conn);
+            SqlCommand cmd = new SqlCommand("SELECT copies.* FROM patrons JOIN checkouts ON (patrons.id = checkouts.patron_id) JOIN copies ON (copies.id = checkouts.copy_id) WHERE patron_id = @PatronId AND checkin = 0 AND @CurrentDate > checkouts.due;", conn);
 
             SqlParameter patronIdParameter = new SqlParameter();
             patronIdParameter.ParameterName = "@PatronId";
             patronIdParameter.Value = this.GetId().ToString();
             cmd.Parameters.Add(patronIdParameter);
+
+            SqlParameter currentDateParameter = new SqlParameter();
+            currentDateParameter.ParameterName = "@CurrentDate";
+            currentDateParameter.Value = currentDate;
+            cmd.Parameters.Add(currentDateParameter);
 
             SqlDataReader rdr = cmd.ExecuteReader();
 
