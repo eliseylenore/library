@@ -8,9 +8,19 @@ namespace Library
     {
         public HomeModule()
         {
-            Get["/"] = _ => {
+            Get["/"] = _ => View["index.cshtml"];
+
+            Get["/patrons"] = _ => {
                 List<Patron> AllPatrons = Patron.GetAll();
-                return View["Patron/index.cshtml", AllPatrons];
+                return View["Patron/patron_index.cshtml", AllPatrons];
+            };
+
+
+            Post["/patron/new"] = _ => {
+                Patron newPatron = new Patron(Request.Form["name"]);
+                newPatron.Save();
+                List<Patron> AllPatrons = Patron.GetAll();
+                return View["Patron/patron_index.cshtml", AllPatrons];
             };
         }
     }
