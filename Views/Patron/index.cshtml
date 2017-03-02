@@ -1,3 +1,19 @@
 @{
     Layout="Shared/_layout.cshtml";
 }
+
+<h3>Don't have an account yet?</h3>
+<button type="button" name="button" class="btn">Add yourself!</button>
+
+@if(@Model != null)
+{
+    foreach(var patron in @Model)
+    {
+        <h4><a href="/patron/@patron.GetId()">@patron.GetName()</a></h4>
+    }
+}
+else
+{
+    <h4>There are no current patrons.</h4>
+    <button type="button" name="button" class="btn">Add yourself!</button>
+}
