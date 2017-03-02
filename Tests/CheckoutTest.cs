@@ -63,6 +63,23 @@ namespace Library
             Assert.Equal(expectedResult, actualResult);
         }
 
+        [Fact]
+        public void CheckIn_MakeCheckInEqualToTrue()
+        {
+            DateTime dueDate = new DateTime(2017, 1, 1);
+            Checkout newCheckout = new Checkout (1, 2, dueDate);
+            newCheckout.Save();
+
+            newCheckout.CheckIn();
+
+            bool expectedResult = true;
+            bool actualResult = newCheckout.GetCheckInStatus();
+
+            Assert.Equal(expectedResult, actualResult);
+        }
+
+        
+
 
 
         public void Dispose()

@@ -209,7 +209,6 @@ namespace Library
                 }
 
             }
-
             Checkout foundCheckout = new Checkout(foundCopyId, foundPatronId, due, foundCheckoutId);
             foundCheckout._checkin = checkin;
 
@@ -222,6 +221,29 @@ namespace Library
                 conn.Close();
             }
             return foundCheckout;
+        }
+
+        public void CheckIn()
+        {
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("UPDATE checkouts SET checkin = 1 OUTPUT INSERTED.checkin WHERE id = @CheckoutId;", conn);
+
+            SqlParameter checkoutId = new SqlParameter();
+            checkoutId.ParameterName = "@CheckoutId";
+            checkoutId.Value = this.GetId();
+            cmd.Parameters.Add(checkoutId);
+
+            cmd.ExecuteNonQuery();
+
+            this._checkin = true;
+
+            if(conn != null)
+            {
+                conn.Close();
+            }
+
         }
 
 
