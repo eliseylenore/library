@@ -74,6 +74,26 @@ namespace Library
             Assert.Equal(expectedResult, actualResult);
         }
 
+        [Fact]
+        public void GetCheckedOutBooks_ReturnListOfBooks()
+        {
+            Patron newPatron = new Patron("Joe");
+            newPatron.Save();
+
+            Book newBook = new Book("Cotton Eyed Joe");
+            newBook.Save();
+
+            Copy newCopy = new Copy(newBook.GetId());
+            newCopy.Save();
+
+            newPatron.Checkout(newCopy.GetId(), "June 12", "Aug 14");
+
+            List<Book> expectedResult = new List<Book>{newBook};
+            List<Book> actualResult = newPatron.GetCheckedOutBooks();
+
+            Assert.Equal(expectedResult, actualResult);
+        }
+
         public void Dispose()
         {
             Patron.DeleteAll();

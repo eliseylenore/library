@@ -168,6 +168,78 @@ namespace Library
             }
         }
 
+        public void Checkout(int copyId, string checkoutDate, string dueDate)
+        {
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("INSERT into checkouts(copy_id, patron_id, checkout, due) OUTPUT INSERTED.id VALUES(@CopyId, @PatronId, @CheckoutDate, @DueDate);", conn);
+
+            SqlParameter copyIdParameter = new SqlParameter();
+            copyIdParameter.ParameterName = "@CopyId";
+            copyIdParameter.Value = copyId;
+            cmd.Parameters.Add(copyIdParameter);
+
+            SqlParameter patronIdParameter = new SqlParameter();
+            patronIdParameter.ParameterName = "@PatronId";
+            patronIdParameter.Value = this._id;
+            cmd.Parameters.Add(patronIdParameter);
+
+            SqlParameter checkoutDateParameter = new SqlParameter();
+            checkoutDateParameter.ParameterName = "@CheckoutDate";
+            checkoutDateParameter.Value = Convert.ToDateTime(checkoutDate);
+            cmd.Parameters.Add(checkoutDateParameter);
+
+            SqlParameter dueDateParameter = new SqlParameter();
+            dueDateParameter.ParameterName = "@DueDate";
+            dueDateParameter.Value = Convert.ToDateTime(dueDate);
+            cmd.Parameters.Add(dueDateParameter);
+
+            cmd.ExecuteNonQuery();
+
+            if(conn != null)
+            {
+                conn.Close();
+            }
+        }
+
+        public List<Book> GetCheckedOutBooks()
+        {
+            List<Book> AllCheckedOutBooks = new List<Book>{};
+
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT books.* FROM patrons JOIN checkouts ON (patrons.id = checkouts.patron_id) JOIN copies ON (copies.id = checkouts.copy_id) JOIN books ON (books.id = copies.book_id) WHERE patron_id = @PatronId;", conn);
+
+            SqlParameter patronIdParameter = new SqlParameter();
+            patronIdParameter.ParameterName = "@PatronId";
+            patronIdParameter.Value = this.GetId().ToString();
+            cmd.Parameters.Add(patronIdParameter);
+
+            SqlDataReader rdr = cmd.ExecuteReader();
+
+            while(rdr.Read())
+            {
+                int bookId = rdr.GetInt32(0);
+                string bookTitle = rdr.GetString(1);
+
+                Book foundBook = new Book(bookTitle, bookId);
+                AllCheckedOutBooks.Add(foundBook);
+            }
+
+            if(rdr != null)
+            {
+                rdr.Close();
+            }
+            if(conn != null)
+            {
+                conn.Close();
+            }
+
+            return AllCheckedOutBooks;
+        }
+
         public void Delete()
         {
             SqlConnection conn = DB.Connection();
