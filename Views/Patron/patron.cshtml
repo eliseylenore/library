@@ -1,0 +1,36 @@
+@{
+    Layout="Shared/_layout.cshtml";
+}
+
+<h2>@Model["patron"].GetName()</h2>
+
+<ul class="collapsible" data-collapsible="accordion">
+  <li>
+    <div class="collapsible-header">See Your Overdue Books
+        @if(@Model["copies"].Count == 0)
+
+    {
+        <span class="hide">(You have no overdue books, good for you!)</span>
+    }</div>
+    <div class="collapsible-body">
+        <form class="overdue" action="/patron/@Model["patron"].GetId()" method="post">
+            <label for="today-date">Today's Date:</label>
+            <input id="today-date" name="today-date" type="date">
+            <button type="submit">Get overdue books</button>
+        </form>
+        @if(@Model["copies"].Count == 0)
+        {
+            <p>You have no overdue books, good for you!</p>
+        }
+        else
+        {
+            <ol>
+                @foreach (var copy in @Model["copies"])
+                {
+                    <li>@copy.GetBook().GetTitle()</li>
+                }
+            </ol>
+        }
+    </div>
+  </li>
+</ul>

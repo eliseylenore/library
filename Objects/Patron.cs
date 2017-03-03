@@ -278,6 +278,53 @@ namespace Library
             return AllCheckedOutCopies;
         }
 
+        public List<Copy> GetAllCheckedOutCopies()
+        {
+            List<Copy> AllCheckedOutCopies = new List<Copy>{};
+
+            SqlConnection conn = DB.Connection();
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT copies.* FROM patrons JOIN checkouts ON (patrons.id = checkouts.patron_id) JOIN copies ON (copies.id = checkouts.copy_id) WHERE patron_id = @PatronId AND checkin = 0;", conn);
+
+            SqlParameter patronIdParameter = new SqlParameter();
+            patronIdParameter.ParameterName = "@PatronId";
+            patronIdParameter.Value = this.GetId().ToString();
+            cmd.Parameters.Add(patronIdParameter);
+
+            SqlDataReader rdr = cmd.ExecuteReader();
+
+            while(rdr.Read())
+            {
+                int copyId = rdr.GetInt32(0);
+                int bookId = rdr.GetInt32(1);
+                bool copyAvailability;
+                if (rdr.GetByte(2) == 1)
+                {
+                    copyAvailability = true;
+                }
+                else{
+                    copyAvailability = false;
+                }
+
+                Copy foundCopy = new Copy(bookId, copyId);
+                foundCopy.SetAvailability(copyAvailability);
+                AllCheckedOutCopies.Add(foundCopy);
+            }
+
+            if(rdr != null)
+            {
+                rdr.Close();
+            }
+            if(conn != null)
+            {
+                conn.Close();
+            }
+
+            return AllCheckedOutCopies;
+        }
+
+
         public void Delete()
         {
             SqlConnection conn = DB.Connection();
